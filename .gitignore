@@ -1,0 +1,35 @@
+# --- Backend (Python) ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Virtual environments
+venv/
+.env
+*.env
+
+# Alembic migrations cache
+alembic.ini
+alembic/versions/*.pyc
+
+# Logs
+*.log
+
+# --- Frontend (Node.js/React/Vue/Angular) ---
+node_modules/
+dist/
+build/
+out/
+
+# Configurações locais
+.vscode/
+.idea/
+
+# Cache e temporários
+*.swp
+*.swo
+*.tmp
+.cache/

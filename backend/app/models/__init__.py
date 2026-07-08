@@ -1,0 +1,7 @@
+from app.models.usuario import Usuario
+from app.models.categoria import Categoria
+from app.models.fornecedor import Fornecedor
+from app.models.cliente import Cliente
+from app.models.unidade import Unidade
+from app.models.produto import Produto
+from app.models.movimentacao_estoque import MovimentacaoEstoque
