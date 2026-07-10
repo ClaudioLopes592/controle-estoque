@@ -1,11 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-export default function Sidebar({
-  sidebarOpen,
-  setSidebarOpen,
-  isDesktop,
-}) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen, isDesktop }) {
   const { usuario } = useAuth();
 
   const menus = [
@@ -45,6 +41,11 @@ export default function Sidebar({
       roles: ["ADMIN", "GERENTE", "OPERADOR"],
     },
     {
+      titulo: "Entradas",
+      rota: "/entradas",
+      roles: ["ADMIN", "GERENTE", "OPERADOR"],
+    },
+    {
       titulo: "Movimentações",
       rota: "/movimentacoes",
       roles: ["ADMIN", "GERENTE", "OPERADOR"],
@@ -52,7 +53,7 @@ export default function Sidebar({
   ];
 
   const menusPermitidos = menus.filter((menu) =>
-    menu.roles.includes(usuario?.perfil)
+    menu.roles.includes(usuario?.perfil),
   );
 
   const renderMenus = () => (
@@ -74,9 +75,7 @@ export default function Sidebar({
                 }}
                 className={({ isActive }) =>
                   `nav-link ${
-                    isActive
-                      ? "active fw-bold text-warning"
-                      : "text-white"
+                    isActive ? "active fw-bold text-warning" : "text-white"
                   }`
                 }
               >
@@ -134,9 +133,7 @@ export default function Sidebar({
           height: "100vh",
           zIndex: 1040,
           transition: "transform .3s ease",
-          transform: sidebarOpen
-            ? "translateX(0)"
-            : "translateX(-100%)",
+          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
         }}
       >
         {renderMenus()}
@@ -144,128 +141,3 @@ export default function Sidebar({
     </>
   );
 }
-
-
-// import { NavLink } from "react-router-dom";
-// import { useAuth } from "../../contexts/AuthContext";
-
-// export default function Sidebar({ sidebarOpen, setSidebarOpen, isDesktop }) {
-//   const { usuario } = useAuth();
-
-//   const menus = [
-//     {
-//       titulo: "Home",
-//       rota: "/",
-//       roles: ["ADMIN", "GERENTE", "OPERADOR"],
-//     },
-//     {
-//       titulo: "Dashboard",
-//       rota: "/dashboard",
-//       roles: ["ADMIN", "GERENTE", "OPERADOR"],
-//     },
-//     {
-//       titulo: "Usuários",
-//       rota: "/usuarios",
-//       roles: ["ADMIN"],
-//     },
-//     {
-//       titulo: "Categorias",
-//       rota: "/categorias",
-//       roles: ["ADMIN", "GERENTE"],
-//     },
-//     {
-//       titulo: "Fornecedores",
-//       rota: "/fornecedores",
-//       roles: ["ADMIN", "GERENTE"],
-//     },
-//     {
-//       titulo: "Clientes",
-//       rota: "/clientes",
-//       roles: ["ADMIN", "GERENTE", "OPERADOR"],
-//     },
-//     {
-//       titulo: "Produtos",
-//       rota: "/produtos",
-//       roles: ["ADMIN", "GERENTE", "OPERADOR"],
-//     },
-//     {
-//       titulo: "Movimentações",
-//       rota: "/movimentacoes",
-//       roles: ["ADMIN", "GERENTE", "OPERADOR"],
-//     },
-//   ];
-
-//   const menusPermitidos = menus.filter((menu) =>
-//     menu.roles.includes(usuario?.perfil),
-//   );
-
-//   return (
-//     <>
-//       {/* Overlay */}
-//       {!isDesktop && sidebarOpen && (
-//         <div
-//           className="d-lg-none position-fixed top-0 start-0 w-100 h-100"
-//           style={{
-//             backgroundColor: "rgba(0,0,0,.45)",
-//             zIndex: 1030,
-//           }}
-//           onClick={() => setSidebarOpen(false)}
-//         />
-//       )}
-
-//       {/* Sidebar */}
-//       <aside
-//             className="bg-dark text-white shadow"
-//             style={{
-//                 width:260,
-//                 minHeight:"100vh",
-//                 flexShrink:0
-//             }}
-//         >
-//       {/* <aside
-//         className={`
-//           bg-dark
-//           text-white
-//           h-100
-//           shadow
-//         `}
-//         style={{
-//           width: "260px",
-//           minHeight: "100vh",
-//           zIndex: 1040,
-//           transition: "transform .3s ease",
-//           transform: isDesktop
-//             ? "translateX(0)"
-//             : sidebarOpen
-//               ? "translateX(0)"
-//               : "translateX(-100%)",
-//           position: isDesktop ? "relative" : "fixed",
-//         }}
-//       > */}
-//         <div className="p-3">
-//           <h4 className="mb-3">Estoque</h4>
-
-//           <hr />
-
-//           <ul className="nav flex-column">
-//             {menusPermitidos.map((menu) => (
-//               <li className="nav-item" key={menu.rota}>
-//                 <NavLink
-//                   to={menu.rota}
-//                   onClick={() => setSidebarOpen(false)}
-//                   className={({ isActive }) =>
-//                     `nav-link ${
-//                       isActive ? "active fw-bold text-warning" : "text-white"
-//                     }`
-//                   }
-//                 >
-//                   {menu.titulo}
-//                 </NavLink>
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//       </aside>
-//     </>
-//   );
-// }

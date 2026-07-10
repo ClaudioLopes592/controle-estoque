@@ -14,6 +14,7 @@ import ListaFornecedores from "../pages/fornecedores/ListaFornecedores";
 import ListaClientes from "../pages/clientes/ListaClientes";
 import ListaProdutos from "../pages/produtos/ListaProdutos";
 import ListaMovimentacoes from "../pages/movimentacoes/ListaMovimentacoes";
+import ListaEntradas from "../pages/entradas/ListaEntradas";
 
 export default function AppRoutes() {
   return (
@@ -91,6 +92,17 @@ export default function AppRoutes() {
             <ProtectedRoute>
               <RoleRoute roles={["ADMIN", "GERENTE", "OPERADOR"]}>
                 <ListaProdutos />
+              </RoleRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/entradas"
+          element={
+            <ProtectedRoute>
+              <RoleRoute roles={["ADMIN", "GERENTE", "OPERADOR"]}>
+                <ListaEntradas />
               </RoleRoute>
             </ProtectedRoute>
           }

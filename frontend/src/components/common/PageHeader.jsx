@@ -24,21 +24,3 @@ export default function PageHeader({ titulo, textoBotao, onNovo }) {
     </div>
   );
 }
-
-// export default function PageHeader({
-//   titulo,
-//   textoBotao,
-//   onNovo,
-// }) {
-//   return (
-//     <div className="d-flex justify-content-between align-items-center mb-4">
-//       <h2 className="mb-0">{titulo}</h2>
-
-//       {textoBotao && (
-//         <button className="btn btn-primary" onClick={onNovo}>
-//           {textoBotao}
-//         </button>
-//       )}
-//     </div>
-//   );
-// }

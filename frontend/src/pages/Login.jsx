@@ -129,6 +129,12 @@ export default function Login() {
                   "Entrar"
                 )}
               </button>
+              <hr />
+              <p className="text-center">
+                <span className="text-muted">
+                  Não possui acesso? Procure o administrador do sistema.
+                </span>
+              </p>
             </form>
 
             <hr />

@@ -14,6 +14,9 @@ from app.api.dashboard import (
     router as dashboard_router,
 )
 from app.api.auth import router as auth_router
+from app.api.entradas_estoque import (
+    router as entrada_router,
+)
 
 app = FastAPI(title="Controle de Estoque", version="1.0.0")
 
@@ -34,3 +37,4 @@ app.include_router(produtos_router)
 app.include_router(movimentacao_router)
 app.include_router(dashboard_router)
 app.include_router(auth_router)
+app.include_router(entrada_router)

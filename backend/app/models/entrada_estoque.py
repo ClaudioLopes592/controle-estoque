@@ -30,19 +30,29 @@ class EntradaEstoque(Base):
         nullable=False,
     )
 
-    tipo_entrada: Mapped[str] = mapped_column(
-        String(20),
-        nullable=False,
+    origem: Mapped[str] = mapped_column(
+        String(30),
         default="COMPRA",
+        nullable=False,
     )
 
-    quantidade: Mapped[int] = mapped_column(
-        Integer,
+    numero_documento: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    quantidade: Mapped[float] = mapped_column(
+        Numeric(12, 2),
         nullable=False,
     )
 
     custo_unitario: Mapped[float] = mapped_column(
-        Numeric(10, 2),
+        Numeric(12, 2),
+        nullable=False,
+    )
+
+    valor_total: Mapped[float] = mapped_column(
+        Numeric(12, 2),
         nullable=False,
     )
 
@@ -60,6 +70,13 @@ class EntradaEstoque(Base):
     criado_em: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
+        nullable=False,
+    )
+
+    atualizado_em: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
         nullable=False,
     )
 
