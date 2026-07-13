@@ -6,3 +6,4 @@ from app.models.unidade import Unidade
 from app.models.produto import Produto
 from app.models.movimentacao_estoque import MovimentacaoEstoque
 from app.models.entrada_estoque import EntradaEstoque
+from app.models.saida_estoque import SaidaEstoque

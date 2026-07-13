@@ -7,16 +7,11 @@ from app.api.fornecedores import router as fornecedores_router
 from app.api.clientes import router as clientes_router
 from app.api.unidades import router as unidades_router
 from app.api.produtos import router as produtos_router
-from app.api.movimentacao_estoque import (
-    router as movimentacao_router,
-)
-from app.api.dashboard import (
-    router as dashboard_router,
-)
+from app.api.movimentacao_estoque import (router as movimentacao_router,)
+from app.api.dashboard import (router as dashboard_router,)
 from app.api.auth import router as auth_router
-from app.api.entradas_estoque import (
-    router as entrada_router,
-)
+from app.api.entradas_estoque import (router as entrada_router,)
+from app.api.saidas_estoque import (router as saidas_router,)
 
 app = FastAPI(title="Controle de Estoque", version="1.0.0")
 
@@ -38,3 +33,4 @@ app.include_router(movimentacao_router)
 app.include_router(dashboard_router)
 app.include_router(auth_router)
 app.include_router(entrada_router)
+app.include_router(saidas_router)

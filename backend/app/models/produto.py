@@ -44,3 +44,8 @@ class Produto(Base):
         "EntradaEstoque",
         back_populates="produto",
     )
+
+    saidas = relationship(
+        "SaidaEstoque",
+        back_populates="produto",
+    )

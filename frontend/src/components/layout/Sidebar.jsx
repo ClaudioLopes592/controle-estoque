@@ -43,7 +43,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, isDesktop }) {
     {
       titulo: "Entradas",
       rota: "/entradas",
-      roles: ["ADMIN", "GERENTE", "OPERADOR"],
+      roles: ["ADMIN", "GERENTE"],
+    },
+    {
+      titulo: "Saídas",
+      rota: "/saidas",
+      roles: ["ADMIN", "GERENTE"],
     },
     {
       titulo: "Movimentações",
