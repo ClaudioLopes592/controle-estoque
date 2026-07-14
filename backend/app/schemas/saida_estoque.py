@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 class SaidaEstoqueBase(BaseModel):
     produto_id: int
     usuario_id: int
-    destino: str = "VENDA"
+    origem: str = "VENDA"
     numero_documento: str | None = None
     quantidade: Decimal
     preco_unitario: Decimal
@@ -22,7 +22,7 @@ class SaidaEstoqueCreate(SaidaEstoqueBase):
 class SaidaEstoqueUpdate(BaseModel):
     produto_id: int | None = None
     usuario_id: int | None = None
-    destino: str | None = None
+    origem: str | None = None
     numero_documento: str | None = None
     quantidade: Decimal | None = None
     preco_unitario: Decimal | None = None

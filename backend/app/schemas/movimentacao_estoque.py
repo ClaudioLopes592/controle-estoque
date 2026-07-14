@@ -23,13 +23,13 @@ class MovimentacaoEstoqueBase(BaseModel):
     observacao: Optional[str] = None
 
 
-class MovimentacaoEstoqueCreate(MovimentacaoEstoqueBase):
-    pass
+# class MovimentacaoEstoqueCreate(MovimentacaoEstoqueBase):
+#     pass
 
 
-class MovimentacaoEstoqueUpdate(BaseModel):
+# class MovimentacaoEstoqueUpdate(BaseModel):
 
-    observacao: Optional[str] = None
+#     observacao: Optional[str] = None
 
 
 class MovimentacaoEstoqueResponse(BaseModel):

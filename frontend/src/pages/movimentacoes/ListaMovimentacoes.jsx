@@ -7,19 +7,12 @@ import Loading from "../../components/common/Loading";
 import AlertMessage from "../../components/common/AlertMessage";
 import DataTable from "../../components/common/DataTable";
 
-import MovimentacaoModal from "../../components/movimentacoes/MovimentacaoModal";
-
 import { listarMovimentacoes } from "../../services/movimentacaoService";
 
 export default function ListaMovimentacoes() {
   const [movimentacoes, setMovimentacoes] = useState([]);
-
-  const [mostrarModal, setMostrarModal] = useState(false);
-
   const [loading, setLoading] = useState(false);
-
   const [mensagem, setMensagem] = useState("");
-
   const [pesquisa, setPesquisa] = useState("");
 
   useEffect(() => {
@@ -62,7 +55,8 @@ export default function ListaMovimentacoes() {
     {
       key: "data_movimento",
       label: "Data",
-      render: (item) => new Date(item.data_movimento).toLocaleString("pt-BR"),
+      render: (item) =>
+        new Date(item.data_movimento).toLocaleString("pt-BR"),
     },
 
     {
@@ -74,7 +68,19 @@ export default function ListaMovimentacoes() {
     {
       key: "tipo",
       label: "Tipo",
-      render: (item) => (item.tipo === "E" ? "Entrada" : "Saída"),
+      render: (item) => (
+        <span
+          className={`badge ${
+            item.tipo === "E"
+              ? "bg-success"
+              : "bg-danger"
+          }`}
+        >
+          {item.tipo === "E"
+            ? "Entrada"
+            : "Saída"}
+        </span>
+      ),
     },
 
     {
@@ -105,13 +111,12 @@ export default function ListaMovimentacoes() {
 
   return (
     <Layout>
-      <PageHeader
-        titulo="Movimentações de Estoque"
-        textoBotao="Nova Movimentação"
-        onNovo={() => setMostrarModal(true)}
-      />
+      <PageHeader titulo="Histórico de Movimentações" />
 
-      <Loading loading={loading} texto="Carregando movimentações..." />
+      <Loading
+        loading={loading}
+        texto="Carregando movimentações..."
+      />
 
       <AlertMessage
         tipo="success"
@@ -129,16 +134,6 @@ export default function ListaMovimentacoes() {
         columns={columns}
         data={movimentacoesFiltradas}
         emptyMessage="Nenhuma movimentação encontrada."
-      />
-
-      <MovimentacaoModal
-        show={mostrarModal}
-        onClose={() => setMostrarModal(false)}
-        onSalvou={() => {
-          carregarMovimentacoes();
-
-          setMensagem("Movimentação registrada com sucesso!");
-        }}
       />
     </Layout>
   );

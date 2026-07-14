@@ -9,6 +9,8 @@ import DataTable from "../../components/common/DataTable";
 import EntradaModal from "../../components/entradas/EntradaModal";
 import PageHeader from "../../components/common/PageHeader";
 
+import { useAuth } from "../../contexts/AuthContext";
+
 import {
   listarEntradas,
   buscarEntrada,
@@ -16,6 +18,7 @@ import {
 } from "../../services/entradaEstoqueService";
 
 export default function ListaEntradas() {
+  const { usuario } = useAuth();
 
   const [entradas, setEntradas] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -163,9 +166,9 @@ export default function ListaEntradas() {
       <EntradaModal
         show={mostrarModal}
         entrada={entradaSelecionada}
+        usuarioId={usuario?.id}
         onClose={() => {
           setMostrarModal(false);
-
           setEntradaSelecionada(null);
         }}
         onSalvou={async () => {

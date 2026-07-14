@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.entrada_estoque import EntradaEstoque
+from app.models.movimentacao_estoque import MovimentacaoEstoque
 from app.models.produto import Produto
 from app.schemas.entrada_estoque import (
     EntradaEstoqueCreate,
@@ -49,6 +50,17 @@ def criar_entrada(
 
     # Atualiza o último custo de compra
     produto.preco_compra = dados.custo_unitario
+
+    # Cria movimentação de estoque
+    movimentacao = MovimentacaoEstoque(
+        produto_id=dados.produto_id,
+        tipo="E",
+        origem=dados.origem,
+        quantidade=dados.quantidade,
+        preco_unitario=dados.custo_unitario,
+        observacao=dados.observacao,
+    )
+    db.add(movimentacao)
 
     db.commit()
 

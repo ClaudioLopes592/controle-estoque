@@ -3,71 +3,50 @@ export default function DashboardCard({
   valor,
   icone,
   cor = "primary",
+  subtitulo = "",
 }) {
   return (
-    <div className="col-12 col-sm-6 col-xl-3 mb-4">
+    <div className="col-12 col-sm-6 col-lg-3">
       <div
-        className={`card border-${cor} shadow-sm h-100`}
+        className="card border-0 shadow-sm h-100"
         style={{
-          transition: "all .2s ease",
+          borderLeft: `5px solid var(--bs-${cor})`,
+          transition: "all .25s ease",
+          cursor: "default",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translateY(-4px)";
+          e.currentTarget.style.boxShadow = "0 .75rem 1.5rem rgba(0,0,0,.12)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "";
         }}
       >
         <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center">
-            <div className="flex-grow-1">
-              <h6 className="text-muted mb-2">{titulo}</h6>
+          <div className="d-flex justify-content-between align-items-start">
+            <div>
+              <small className="text-muted text-uppercase fw-semibold">
+                {titulo}
+              </small>
 
-              <h3 className="fw-bold mb-0">{valor}</h3>
+              <h2 className="fw-bold mt-2 mb-1">{valor}</h2>
+
+              {subtitulo && <small className="text-muted">{subtitulo}</small>}
             </div>
 
-            {icone && (
-              <div
-                className={`text-${cor} ms-3 d-flex align-items-center justify-content-center`}
-                style={{
-                  fontSize: "2rem",
-                  minWidth: "48px",
-                }}
-              >
-                {icone}
-              </div>
-            )}
+            <div
+              className={`text-${cor}`}
+              style={{
+                fontSize: "2.8rem",
+                lineHeight: 1,
+              }}
+            >
+              {icone}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-// export default function DashboardCard({
-//   titulo,
-//   valor,
-//   icone,
-//   cor = "primary",
-// }) {
-//   return (
-//     <div className="col-md-6 col-lg-3 mb-4">
-//       <div className={`card border-${cor} shadow-sm h-100`}>
-//         <div className="card-body">
-//           <div className="d-flex justify-content-between align-items-center">
-//             <div>
-//               <h6 className="text-muted mb-2">{titulo}</h6>
-
-//               <h3 className="fw-bold mb-0">{valor}</h3>
-//             </div>
-
-//             {icone && (
-//               <div
-//                 className={`text-${cor}`}
-//                 style={{
-//                   fontSize: "2.2rem",
-//                 }}
-//               >
-//                 {icone}
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }

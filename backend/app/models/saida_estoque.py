@@ -25,7 +25,7 @@ class SaidaEstoque(Base):
         nullable=False,
     )
 
-    destino: Mapped[str] = mapped_column(
+    origem: Mapped[str] = mapped_column(
         String(30),
         default="VENDA",
         nullable=False,

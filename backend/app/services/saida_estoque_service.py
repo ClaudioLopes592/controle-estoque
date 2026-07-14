@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.produto import Produto
 from app.models.saida_estoque import SaidaEstoque
+from app.models.movimentacao_estoque import MovimentacaoEstoque
 from app.schemas.saida_estoque import (
     SaidaEstoqueCreate,
     SaidaEstoqueUpdate,
@@ -26,7 +27,11 @@ class SaidaEstoqueService:
     @staticmethod
     def criar(db: Session, dados: SaidaEstoqueCreate):
 
-        produto = db.query(Produto).filter(Produto.id == dados.produto_id).first()
+        produto = (
+            db.query(Produto)
+            .filter(Produto.id == dados.produto_id)
+            .first()
+        )
 
         if not produto:
             raise ValueError("Produto não encontrado.")
@@ -36,11 +41,25 @@ class SaidaEstoqueService:
         if estoque_atual < float(dados.quantidade):
             raise ValueError("Estoque insuficiente para realizar a saída.")
 
+        # Atualiza estoque
         produto.estoque_atual = estoque_atual - float(dados.quantidade)
 
+        # Registra a saída
         saida = SaidaEstoque(**dados.model_dump())
 
         db.add(saida)
+
+        # Registra automaticamente a movimentação
+        movimentacao = MovimentacaoEstoque(
+            produto_id=dados.produto_id,
+            tipo="S",
+            origem=dados.origem,
+            quantidade=dados.quantidade,
+            preco_unitario=dados.preco_unitario,
+            observacao=dados.observacao,
+        )
+
+        db.add(movimentacao)
 
         db.commit()
 

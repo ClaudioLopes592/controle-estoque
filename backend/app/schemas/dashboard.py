@@ -1,22 +1,35 @@
-from decimal import Decimal
+from datetime import datetime
 
 from pydantic import BaseModel
 
-from app.schemas.movimentacao_estoque import (
-    MovimentacaoEstoqueResponse,
-)
+
+class UltimaMovimentacaoSchema(BaseModel):
+    id: int
+    produto: str
+    tipo: str
+    quantidade: float
+    data_movimento: datetime
+
+    model_config = {
+        "from_attributes": True
+    }
 
 
-class DashboardResponse(BaseModel):
+class DashboardSchema(BaseModel):
     total_produtos: int
     total_categorias: int
     total_clientes: int
     total_fornecedores: int
 
+    estoque_total: float
+    valor_total_estoque: float
     produtos_estoque_baixo: int
 
-    valor_total_estoque: Decimal
+    entradas_hoje: int
+    saidas_hoje: int
 
-    ultimas_movimentacoes: list[MovimentacaoEstoqueResponse]
+    ultimas_movimentacoes: list[UltimaMovimentacaoSchema]
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True
+    }

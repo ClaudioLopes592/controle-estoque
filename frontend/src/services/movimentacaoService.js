@@ -12,7 +12,7 @@ export async function buscarMovimentacao(id) {
   return response.data;
 }
 
-export async function criarMovimentacao(dados) {
-  const response = await api.post(URL, dados);
-  return response.data;
-}
+// export async function criarMovimentacao(dados) {
+//   const response = await api.post(URL, dados);
+//   return response.data;
+// }

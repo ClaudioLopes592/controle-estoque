@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import Layout from "../../components/layout/Layout";
 import Loading from "../../components/common/Loading";
@@ -7,8 +7,16 @@ import DataTable from "../../components/common/DataTable";
 
 import DashboardCard from "../../components/dashboard/DashboardCard";
 import DashboardSection from "../../components/dashboard/DashboardSection";
+import DashboardResumo from "../../components/dashboard/DashboardResumo";
+import DashboardFinanceiro from "../../components/dashboard/DashboardFinanceiro";
+import DashboardMovimentacoes from "../../components/dashboard/DashboardMovimentacoes";
+import DashboardPieChart from "../../components/dashboard/DashboardPieChart";
 
-import { obterDashboard } from "../../services/dashboardService";
+import {
+  obterDashboard,
+  obterEntradasSaidas,
+  obterEstoqueCategorias,
+} from "../../services/dashboardService";
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
@@ -17,23 +25,54 @@ export default function Dashboard() {
 
   const [erro, setErro] = useState("");
 
+  const [ultimaAtualizacao, setUltimaAtualizacao] = useState(new Date());
+
+  const [graficoEntradasSaidas, setGraficoEntradasSaidas] = useState([]);
+
+  const [graficoCategorias, setGraficoCategorias] = useState([]);
+
+  const carregando = useRef(false);
+
   useEffect(() => {
     carregarDashboard();
+
+    const interval = setInterval(() => {
+      carregarDashboard();
+    }, 30000); // Atualiza a cada 30 segundos
+
+    return () => clearInterval(interval);
   }, []);
 
   async function carregarDashboard() {
-    setLoading(true);
+    if (carregando.current) return;
+
+    carregando.current = true;
 
     try {
-      const dados = await obterDashboard();
+      const [resumo, entradasSaidas, categorias] = await Promise.all([
+        obterDashboard(),
+        obterEntradasSaidas(),
+        obterEstoqueCategorias(),
+      ]);
 
-      setDashboard(dados);
+      setDashboard(resumo);
+
+      setGraficoEntradasSaidas([
+        {
+          tipo: "Entradas",
+          quantidade: entradasSaidas.entradas,
+        },
+        {
+          tipo: "Saídas",
+          quantidade: entradasSaidas.saidas,
+        },
+      ]);
+
+      setGraficoCategorias(categorias);
     } catch (error) {
       console.error(error);
 
       setErro("Erro ao carregar o Dashboard.");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -92,105 +131,45 @@ export default function Dashboard() {
         }),
     },
   ];
-
   return (
-    <Layout>
-      <h2 className="mb-4">Dashboard</h2>
+    <>
+      <Layout>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="mb-4">Dashboard</h2>
 
-      <div className="row">
-        <DashboardCard
-          titulo="Produtos"
-          valor={dashboard.total_produtos}
-          icone="📦"
+          <small className="text-muted">
+            Atualizado às {ultimaAtualizacao.toLocaleTimeString("pt-BR")}
+          </small>
+        </div>
+
+        <DashboardResumo dashboard={dashboard} />
+
+        <DashboardFinanceiro dashboard={dashboard} />
+
+        <DashboardMovimentacoes
+          movimentacoes={dashboard.ultimas_movimentacoes}
         />
 
-        <DashboardCard
-          titulo="Categorias"
-          valor={dashboard.total_categorias}
-          icone="🗂️"
-          cor="success"
-        />
+        <div className="row mt-4">
+          <div className="col-lg-6 mb-4">
+            <DashboardPieChart
+              titulo="Entradas x Saídas"
+              dados={graficoEntradasSaidas}
+              dataKey="quantidade"
+              nameKey="tipo"
+            />
+          </div>
 
-        <DashboardCard
-          titulo="Clientes"
-          valor={dashboard.total_clientes}
-          icone="👤"
-          cor="warning"
-        />
-
-        <DashboardCard
-          titulo="Fornecedores"
-          valor={dashboard.total_fornecedores}
-          icone="🏢"
-          cor="info"
-        />
-      </div>
-
-      <div className="row mt-3">
-        <div className="col-md-6">
-          <div className="card shadow-sm mb-4">
-            {/* <div className="card-header">
-              <strong>Valor Total do Estoque</strong>
-            </div> */}
-
-            <DashboardSection titulo="Valor Total do Estoque">
-              <h3 className="text-success">
-                {Number(dashboard.valor_total_estoque).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </h3>
-            </DashboardSection>
-
-            {/* <div className="card-body">
-              <h3 className="text-success">
-                {Number(dashboard.valor_total_estoque).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </h3>
-            </div> */}
+          <div className="col-lg-6 mb-4">
+            <DashboardPieChart
+              titulo="Estoque por Categoria"
+              dados={graficoCategorias}
+              dataKey="valor"
+              nameKey="categoria"
+            />
           </div>
         </div>
-        <DashboardSection titulo="Produtos com Estoque Baixo">
-          <h3 className="text-danger">{dashboard.produtos_estoque_baixo}</h3>
-        </DashboardSection>
-
-        {/* <div className="col-md-6">
-          <div className="card shadow-sm mb-4">
-            <div className="card-header">
-              <strong>Produtos com Estoque Baixo</strong>
-            </div>
-
-            <div className="card-body">
-              <h3 className="text-danger">
-                {dashboard.produtos_estoque_baixo}
-              </h3>
-            </div>
-          </div>
-        </div> */}
-      </div>
-      <DashboardSection titulo="Últimas Movimentações">
-        <DataTable
-          columns={columns}
-          data={dashboard.ultimas_movimentacoes}
-          emptyMessage="Nenhuma movimentação encontrada."
-        />
-      </DashboardSection>
-
-      {/* <div className="card shadow-sm">
-        <div className="card-header">
-          <strong>Últimas Movimentações</strong>
-        </div>
-
-        <div className="card-body">
-          <DataTable
-            columns={columns}
-            data={dashboard.ultimas_movimentacoes}
-            emptyMessage="Nenhuma movimentação encontrada."
-          />
-        </div>
-      </div> */}
-    </Layout>
+      </Layout>
+    </>
   );
 }
