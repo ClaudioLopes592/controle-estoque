@@ -46,11 +46,40 @@ class EntradaEstoqueUpdate(BaseModel):
     data_entrada: datetime | None = None
 
 
+class ProdutoResumo(BaseModel):
+    id: int
+    nome: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class FornecedorResumo(BaseModel):
+    id: int
+    nome: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UsuarioResumo(BaseModel):
+    id: int
+    nome: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class EntradaEstoqueResponse(EntradaEstoqueBase):
     id: int
 
+    data_entrada: datetime
+
     criado_em: datetime
 
-    atualizado_em: datetime
+    produto: ProdutoResumo | None = None
 
-    model_config = ConfigDict(from_attributes=True)
+    fornecedor: FornecedorResumo | None = None
+
+    usuario: UsuarioResumo | None = None
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )

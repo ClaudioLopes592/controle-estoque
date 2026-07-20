@@ -15,7 +15,9 @@ export default function SaidaModal({
 }) {
   const [form, setForm] = useState({
     produto_id: "",
-    destino: "VENDA",
+    usuario_id: usuarioId,
+    cliente_id: "",
+    origem: "VENDA",
     numero_documento: "",
     quantidade: 1,
     preco_unitario: 0,
@@ -30,7 +32,9 @@ export default function SaidaModal({
     if (saida) {
       setForm({
         produto_id: saida.produto_id ?? "",
-        destino: saida.destino ?? "VENDA",
+        usuario_id: saida.usuario_id ?? usuarioId,
+        cliente_id: saida.cliente_id ?? "",
+        origem: saida.origem ?? "VENDA",
         numero_documento: saida.numero_documento ?? "",
         quantidade: saida.quantidade ?? 1,
         preco_unitario: saida.preco_unitario ?? 0,
@@ -40,7 +44,9 @@ export default function SaidaModal({
     } else {
       setForm({
         produto_id: "",
-        destino: "VENDA",
+        usuario_id: usuarioId,
+        cliente_id: "",
+        origem: "VENDA",
         numero_documento: "",
         quantidade: 1,
         preco_unitario: 0,
@@ -50,7 +56,7 @@ export default function SaidaModal({
     }
 
     setErro("");
-  }, [saida, show]);
+  }, [saida, show, usuarioId]);
 
   useEffect(() => {
     const quantidade = Number(form.quantidade) || 0;
@@ -73,6 +79,12 @@ export default function SaidaModal({
     e.preventDefault();
 
     setErro("");
+
+    if (form.origem === "VENDA" && !form.cliente_id) {
+      setErro("Selecione um cliente.");
+      return;
+    }
+
     setSalvando(true);
 
     try {
@@ -80,6 +92,7 @@ export default function SaidaModal({
         ...form,
         produto_id: Number(form.produto_id),
         usuario_id: usuarioId,
+        cliente_id: form.cliente_id === "" ? null : Number(form.cliente_id),
         quantidade: Number(form.quantidade),
         preco_unitario: Number(form.preco_unitario),
         valor_total: Number(form.valor_total),
@@ -130,12 +143,20 @@ export default function SaidaModal({
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">Destino</label>
+          <label className="form-label">Origem</label>
 
           <select
             className="form-select"
-            value={form.destino}
-            onChange={(e) => alterarCampo("destino", e.target.value)}
+            value={form.origem}
+            onChange={(e) => {
+              const origem = e.target.value;
+
+              setForm((old) => ({
+                ...old,
+                origem,
+                cliente_id: origem === "VENDA" ? old.cliente_id : "",
+              }));
+            }}
           >
             <option value="VENDA">Venda</option>
             <option value="DEVOLUCAO">Devolução</option>
@@ -145,6 +166,19 @@ export default function SaidaModal({
             <option value="AJUSTE">Ajuste</option>
           </select>
         </div>
+
+        {form.origem === "VENDA" && (
+          <div className="col-md-6">
+            <label className="form-label">Cliente</label>
+
+            <SelectApi
+              endpoint="/clientes"
+              value={form.cliente_id}
+              onChange={(v) => alterarCampo("cliente_id", v)}
+              placeholder="Selecione o cliente"
+            />
+          </div>
+        )}
 
         <div className="col-md-6">
           <label className="form-label">Número do Documento</label>

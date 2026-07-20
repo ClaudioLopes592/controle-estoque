@@ -15,6 +15,18 @@ class UltimaMovimentacaoSchema(BaseModel):
     }
 
 
+class ProdutoEstoqueBaixoSchema(BaseModel):
+    id: int
+    nome: str
+    estoque_atual: float
+    estoque_minimo: float
+    unidade: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 class DashboardSchema(BaseModel):
     total_produtos: int
     total_categorias: int
@@ -23,7 +35,11 @@ class DashboardSchema(BaseModel):
 
     estoque_total: float
     valor_total_estoque: float
+
     produtos_estoque_baixo: int
+
+    # NOVO CAMPO
+    lista_produtos_estoque_baixo: list[ProdutoEstoqueBaixoSchema]
 
     entradas_hoje: int
     saidas_hoje: int

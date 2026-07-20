@@ -25,6 +25,11 @@ class SaidaEstoque(Base):
         nullable=False,
     )
 
+    cliente_id: Mapped[int | None] = mapped_column(
+        ForeignKey("clientes.id"),
+        nullable=True,
+    )
+
     origem: Mapped[str] = mapped_column(
         String(30),
         default="VENDA",
@@ -75,4 +80,8 @@ class SaidaEstoque(Base):
 
     usuario = relationship(
         "Usuario",
+    )
+
+    cliente = relationship(
+        "Cliente",
     )

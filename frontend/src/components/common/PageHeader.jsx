@@ -19,7 +19,6 @@ export default function PageHeader({ titulo, textoBotao, onNovo }) {
           </button>
         )}
       </div>
-
       <hr />
     </div>
   );

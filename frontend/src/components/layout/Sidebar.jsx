@@ -26,6 +26,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, isDesktop }) {
       roles: ["ADMIN", "GERENTE"],
     },
     {
+      titulo: "Unidades",
+      rota: "/unidades",
+      icone: "bi-rulers",
+      roles: ["ADMIN", "GERENTE"],
+    },
+    {
       titulo: "Fornecedores",
       rota: "/fornecedores",
       roles: ["ADMIN", "GERENTE"],
@@ -93,9 +99,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, isDesktop }) {
     </>
   );
 
-  // ==========================
-  // DESKTOP
-  // ==========================
   if (isDesktop) {
     return (
       <aside
@@ -111,9 +114,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, isDesktop }) {
     );
   }
 
-  // ==========================
-  // MOBILE
-  // ==========================
   return (
     <>
       {sidebarOpen && (

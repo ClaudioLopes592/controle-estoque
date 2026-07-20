@@ -25,7 +25,6 @@ export default function EntradaModal({
     custo_unitario: 0,
     valor_total: 0,
     observacao: "",
-    // data_entrada: "",
   });
 
   const [erro, setErro] = useState("");
@@ -42,9 +41,6 @@ export default function EntradaModal({
         custo_unitario: entrada.custo_unitario ?? 0,
         valor_total: entrada.valor_total ?? 0,
         observacao: entrada.observacao ?? "",
-        // data_entrada: entrada.data_entrada
-        //   ? entrada.data_entrada.substring(0, 16)
-        //   : "",
       });
     } else {
       setForm({
@@ -56,7 +52,6 @@ export default function EntradaModal({
         custo_unitario: 0,
         valor_total: 0,
         observacao: "",
-        // data_entrada: "",
       });
     }
 
@@ -113,9 +108,6 @@ export default function EntradaModal({
       } else {
         setErro(detalhe ?? "Erro ao salvar entrada de estoque.");
       }
-      // setErro(
-      //   err.response?.data?.detail ?? "Erro ao salvar entrada de estoque.",
-      // );
     } finally {
       setSalvando(false);
     }

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
@@ -9,13 +9,7 @@ from app.schemas.entrada_estoque import (
     EntradaEstoqueResponse,
 )
 
-from app.services.entrada_estoque_service import (
-    listar_entradas,
-    buscar_entrada,
-    criar_entrada,
-    atualizar_entrada,
-    excluir_entrada,
-)
+from app.services.entrada_estoque_service import EntradaEstoqueService
 
 router = APIRouter(
     prefix="/entradas",
@@ -30,7 +24,7 @@ router = APIRouter(
 def listar(
     db: Session = Depends(get_db),
 ):
-    return listar_entradas(db)
+    return EntradaEstoqueService.listar(db)
 
 
 @router.get(
@@ -41,10 +35,17 @@ def buscar(
     entrada_id: int,
     db: Session = Depends(get_db),
 ):
-    return buscar_entrada(
-        db,
-        entrada_id,
-    )
+    try:
+        return EntradaEstoqueService.buscar_por_id(
+            db,
+            entrada_id,
+        )
+
+    except ValueError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(erro),
+        )
 
 
 @router.post(
@@ -56,7 +57,7 @@ def criar(
     dados: EntradaEstoqueCreate,
     db: Session = Depends(get_db),
 ):
-    return criar_entrada(
+    return EntradaEstoqueService.criar(
         db,
         dados,
     )
@@ -71,7 +72,7 @@ def atualizar(
     dados: EntradaEstoqueUpdate,
     db: Session = Depends(get_db),
 ):
-    return atualizar_entrada(
+    return EntradaEstoqueService.atualizar(
         db,
         entrada_id,
         dados,
@@ -86,7 +87,7 @@ def excluir(
     entrada_id: int,
     db: Session = Depends(get_db),
 ):
-    excluir_entrada(
+    EntradaEstoqueService.excluir(
         db,
         entrada_id,
     )

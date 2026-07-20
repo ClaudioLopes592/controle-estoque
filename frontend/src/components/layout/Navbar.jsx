@@ -7,7 +7,7 @@ export default function Navbar({ sidebarOpen, setSidebarOpen, isDesktop }) {
   return (
     <nav className="navbar navbar-dark bg-primary shadow-sm">
       <div className="container-fluid">
-        {/* Botão do menu */}
+        
         {!isDesktop && (
           <button
             className="btn btn-primary border-0 me-3"
@@ -17,12 +17,10 @@ export default function Navbar({ sidebarOpen, setSidebarOpen, isDesktop }) {
           </button>
         )}
 
-        {/* Nome do sistema */}
         <span className="navbar-brand mb-0">
           Sistema de Controle de Estoque
         </span>
 
-        {/* Usuário */}
         <div className="ms-auto d-flex align-items-center gap-3">
           <span className="text-white">{usuario?.nome}</span>
 

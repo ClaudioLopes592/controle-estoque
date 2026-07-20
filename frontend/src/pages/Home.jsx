@@ -5,7 +5,6 @@ export default function Home() {
     <Layout>
       <div className="container-fluid">
 
-        {/* Banner */}
         <div className="card shadow-sm border-0 mb-4">
           <div className="row g-0 align-items-center">
 
@@ -46,8 +45,6 @@ export default function Home() {
 
           </div>
         </div>
-
-        {/* Recursos */}
 
         <div className="row">
 

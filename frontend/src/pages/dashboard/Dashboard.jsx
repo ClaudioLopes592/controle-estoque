@@ -11,6 +11,7 @@ import DashboardResumo from "../../components/dashboard/DashboardResumo";
 import DashboardFinanceiro from "../../components/dashboard/DashboardFinanceiro";
 import DashboardMovimentacoes from "../../components/dashboard/DashboardMovimentacoes";
 import DashboardPieChart from "../../components/dashboard/DashboardPieChart";
+import DashboardEstoqueBaixo from "../../components/dashboard/DashboardEstoqueBaixo";
 
 import {
   obterDashboard,
@@ -131,6 +132,8 @@ export default function Dashboard() {
         }),
     },
   ];
+
+  console.log(dashboard);
   return (
     <>
       <Layout>
@@ -143,6 +146,10 @@ export default function Dashboard() {
         </div>
 
         <DashboardResumo dashboard={dashboard} />
+
+        <DashboardEstoqueBaixo
+          produtos={dashboard.lista_produtos_estoque_baixo}
+        />
 
         <DashboardFinanceiro dashboard={dashboard} />
 

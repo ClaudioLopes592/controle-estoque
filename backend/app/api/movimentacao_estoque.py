@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app.database.session import get_db
 
 from app.schemas.movimentacao_estoque import (
-    # MovimentacaoEstoqueCreate,
     MovimentacaoEstoqueResponse,
 )
 
@@ -46,25 +45,3 @@ def buscar_movimentacao(
         )
 
     return movimentacao
-
-
-# @router.post(
-#     "/",
-#     response_model=MovimentacaoEstoqueResponse,
-#     status_code=201,
-# )
-# def criar_movimentacao(
-#     dados: MovimentacaoEstoqueCreate,
-#     db: Session = Depends(get_db),
-# ):
-#     try:
-#         return MovimentacaoEstoqueService.criar(
-#             db,
-#             dados,
-#         )
-
-#     except ValueError as e:
-#         raise HTTPException(
-#             status_code=400,
-#             detail=str(e),
-#         )

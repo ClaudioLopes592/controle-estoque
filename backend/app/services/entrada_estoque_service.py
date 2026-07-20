@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.entrada_estoque import EntradaEstoque
 from app.models.movimentacao_estoque import MovimentacaoEstoque
@@ -10,128 +10,185 @@ from app.schemas.entrada_estoque import (
 )
 
 
-def listar_entradas(db: Session):
-    return db.query(EntradaEstoque).order_by(EntradaEstoque.data_entrada.desc()).all()
+class EntradaEstoqueService:
 
-
-def buscar_entrada(
-    db: Session,
-    entrada_id: int,
-):
-    entrada = db.query(EntradaEstoque).filter(EntradaEstoque.id == entrada_id).first()
-
-    if not entrada:
-        raise HTTPException(
-            status_code=404,
-            detail="Entrada de estoque não encontrada.",
+    @staticmethod
+    def listar(db: Session):
+        return (
+            db.query(EntradaEstoque)
+            .options(
+                joinedload(EntradaEstoque.produto),
+                joinedload(EntradaEstoque.fornecedor),
+                joinedload(EntradaEstoque.usuario),
+            )
+            .order_by(EntradaEstoque.data_entrada.desc())
+            .all()
         )
 
-    return entrada
-
-
-def criar_entrada(
-    db: Session,
-    dados: EntradaEstoqueCreate,
-):
-    produto = db.query(Produto).filter(Produto.id == dados.produto_id).first()
-
-    if not produto:
-        raise HTTPException(
-            status_code=404,
-            detail="Produto não encontrado.",
+    @staticmethod
+    def buscar_por_id(
+        db: Session,
+        entrada_id: int,
+    ):
+        entrada = (
+            db.query(EntradaEstoque)
+            .options(
+                joinedload(EntradaEstoque.produto),
+                joinedload(EntradaEstoque.fornecedor),
+                joinedload(EntradaEstoque.usuario),
+            )
+            .filter(EntradaEstoque.id == entrada_id)
+            .first()
         )
 
-    entrada = EntradaEstoque(**dados.model_dump())
+        if not entrada:
+            raise HTTPException(
+                status_code=404,
+                detail="Entrada de estoque não encontrada.",
+            )
 
-    db.add(entrada)
+        return entrada
 
-    # Atualiza estoque
-    produto.estoque_atual += dados.quantidade
-
-    # Atualiza o último custo de compra
-    produto.preco_compra = dados.custo_unitario
-
-    # Cria movimentação de estoque
-    movimentacao = MovimentacaoEstoque(
-        produto_id=dados.produto_id,
-        tipo="E",
-        origem=dados.origem,
-        quantidade=dados.quantidade,
-        preco_unitario=dados.custo_unitario,
-        observacao=dados.observacao,
-    )
-    db.add(movimentacao)
-
-    db.commit()
-
-    db.refresh(entrada)
-
-    return entrada
-
-
-def atualizar_entrada(
-    db: Session,
-    entrada_id: int,
-    dados: EntradaEstoqueUpdate,
-):
-    entrada = buscar_entrada(
-        db,
-        entrada_id,
-    )
-
-    produto = db.query(Produto).filter(Produto.id == entrada.produto_id).first()
-
-    if not produto:
-        raise HTTPException(
-            status_code=404,
-            detail="Produto não encontrado.",
+    @staticmethod
+    def criar(
+        db: Session,
+        dados: EntradaEstoqueCreate,
+    ):
+        produto = (
+            db.query(Produto)
+            .filter(Produto.id == dados.produto_id)
+            .first()
         )
 
-    dados_atualizados = dados.model_dump(exclude_unset=True)
+        if not produto:
+            raise HTTPException(
+                status_code=404,
+                detail="Produto não encontrado.",
+            )
 
-    # Ajusta o estoque caso a quantidade seja alterada
-    if "quantidade" in dados_atualizados:
+        entrada = EntradaEstoque(**dados.model_dump())
 
-        quantidade_antiga = entrada.quantidade
-        quantidade_nova = dados_atualizados["quantidade"]
+        db.add(entrada)
 
-        diferenca = quantidade_nova - quantidade_antiga
+        produto.estoque_atual += dados.quantidade
 
-        produto.estoque_atual += diferenca
+        produto.preco_compra = dados.custo_unitario
 
-    # Atualiza o preço de compra caso informado
-    if "custo_unitario" in dados_atualizados:
-        produto.preco_compra = dados_atualizados["custo_unitario"]
+        db.flush()
 
-    # Atualiza os demais campos
-    for campo, valor in dados_atualizados.items():
-        setattr(
-            entrada,
-            campo,
-            valor,
+        movimentacao = MovimentacaoEstoque(
+            entrada_id=entrada.id,
+            produto_id=dados.produto_id,
+            usuario_id=dados.usuario_id,
+            tipo="E",
+            origem=dados.origem,
+            quantidade=dados.quantidade,
+            preco_unitario=dados.custo_unitario,
+            observacao=dados.observacao,
         )
 
-    db.commit()
+        db.add(movimentacao)
 
-    db.refresh(entrada)
+        db.commit()
 
-    return entrada
+        db.refresh(entrada)
 
+        return (
+            db.query(EntradaEstoque)
+            .options(
+                joinedload(EntradaEstoque.produto),
+                joinedload(EntradaEstoque.fornecedor),
+                joinedload(EntradaEstoque.usuario),
+            )
+            .filter(EntradaEstoque.id == entrada.id)
+            .first()
+        )
 
-def excluir_entrada(
-    db: Session,
-    entrada_id: int,
-):
-    entrada = buscar_entrada(
-        db,
-        entrada_id,
-    )
+    @staticmethod
+    def atualizar(
+        db: Session,
+        entrada_id: int,
+        dados: EntradaEstoqueUpdate,
+    ):
+        entrada = EntradaEstoqueService.buscar_por_id(
+            db,
+            entrada_id,
+        )
 
-    produto = db.query(Produto).filter(Produto.id == entrada.produto_id).first()
+        produto = db.query(Produto).filter(Produto.id == entrada.produto_id).first()
 
-    if produto:
-        produto.estoque_atual -= entrada.quantidade
+        if not produto:
+            raise HTTPException(
+                status_code=404,
+                detail="Produto não encontrado.",
+            )
 
-    db.delete(entrada)
+        dados_atualizados = dados.model_dump(exclude_unset=True)
 
-    db.commit()
+        if "quantidade" in dados_atualizados:
+
+            quantidade_antiga = entrada.quantidade
+            quantidade_nova = dados_atualizados["quantidade"]
+
+            diferenca = quantidade_nova - quantidade_antiga
+
+            produto.estoque_atual += diferenca
+
+        if "custo_unitario" in dados_atualizados:
+            produto.preco_compra = dados_atualizados["custo_unitario"]
+
+        for campo, valor in dados_atualizados.items():
+            setattr(
+                entrada,
+                campo,
+                valor,
+            )
+
+        db.commit()
+
+        db.refresh(entrada)
+
+        return (
+            db.query(EntradaEstoque)
+            .options(
+                joinedload(EntradaEstoque.produto),
+                joinedload(EntradaEstoque.fornecedor),
+                joinedload(EntradaEstoque.usuario),
+            )
+            .filter(EntradaEstoque.id == entrada.id)
+            .first()
+        )
+
+    @staticmethod
+    def excluir(
+        db: Session,
+        entrada_id: int,
+    ):
+        entrada = EntradaEstoqueService.buscar_por_id(
+            db,
+            entrada_id,
+        )
+
+        produto = (
+            db.query(Produto)
+            .filter(Produto.id == entrada.produto_id)
+            .first()
+        )
+
+        if produto:
+            produto.estoque_atual -= entrada.quantidade
+
+        movimentacao = (
+            db.query(MovimentacaoEstoque)
+            .filter(
+                MovimentacaoEstoque.entrada_id == entrada.id
+            )
+            .first()
+        )
+
+        if movimentacao:
+            db.delete(movimentacao)
+
+        db.delete(entrada)
+
+        db.commit()

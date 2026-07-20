@@ -44,16 +44,6 @@ class ProdutoService:
             .first()
         )
 
-    # @staticmethod
-    # def listar(db: Session):
-
-    #     return db.query(Produto).order_by(Produto.nome).all()
-
-    # @staticmethod
-    # def buscar_por_id(db: Session, produto_id: int):
-
-    #     return db.query(Produto).filter(Produto.id == produto_id).first()
-
     @staticmethod
     def criar(db: Session, dados: ProdutoCreate):
 

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 
 import Layout from "../../components/layout/Layout";
-import AlertMessage from "../../components/common/AlertMessage";
-import Loading from "../../components/common/Loading";
-import SearchBox from "../../components/common/SearchBox";
-import DataTable from "../../components/common/DataTable";
 import PageHeader from "../../components/common/PageHeader";
-import SaidaModal from "../../components/saidas/SaidaModal";
+import SearchBox from "../../components/common/SearchBox";
+import Loading from "../../components/common/Loading";
+import AlertMessage from "../../components/common/AlertMessage";
+import DataTable from "../../components/common/DataTable";
 
-import { useAuth } from "../../contexts/AuthContext";
+import SaidaModal from "../../components/saidas/SaidaModal";
 
 import {
   listarSaidas,
@@ -16,14 +15,17 @@ import {
   excluirSaida,
 } from "../../services/saidaEstoqueService";
 
-export default function ListaSaidas() {
-  const { usuario } = useAuth();
-
+export default function ListaSaidas({ usuarioId=1 }) {
   const [saidas, setSaidas] = useState([]);
+
   const [loading, setLoading] = useState(false);
+
   const [mensagem, setMensagem] = useState("");
+
   const [pesquisa, setPesquisa] = useState("");
+
   const [mostrarModal, setMostrarModal] = useState(false);
+
   const [saidaSelecionada, setSaidaSelecionada] = useState(null);
 
   useEffect(() => {
@@ -61,9 +63,7 @@ export default function ListaSaidas() {
   }
 
   async function excluir(id) {
-    const confirma = window.confirm("Deseja realmente excluir esta saída?");
-
-    if (!confirma) return;
+    if (!window.confirm("Deseja realmente excluir esta saída?")) return;
 
     await excluirSaida(id);
 
@@ -72,33 +72,55 @@ export default function ListaSaidas() {
     setMensagem("Saída excluída com sucesso.");
   }
 
-  const saidasFiltradas = saidas.filter((saida) => {
+  const saidasFiltradas = saidas.filter((item) => {
     const texto = pesquisa.toLowerCase();
 
     return (
-      saida.numero_documento?.toLowerCase().includes(texto) ||
-      saida.destino?.toLowerCase().includes(texto)
+      item.produto?.nome?.toLowerCase().includes(texto) ||
+      item.cliente?.nome?.toLowerCase().includes(texto) ||
+      item.origem?.toLowerCase().includes(texto) ||
+      item.numero_documento?.toLowerCase().includes(texto)
     );
   });
 
   const columns = [
     {
-      key: "id",
-      label: "ID",
-      width: "70px",
+      key: "data_saida",
+      label: "Data",
+      render: (item) => new Date(item.data_saida).toLocaleString("pt-BR"),
     },
 
     {
-      key: "produto_id",
+      key: "produto",
       label: "Produto",
+      render: (item) => item.produto?.nome,
     },
 
     {
-      key: "destino",
-      label: "Destino",
-      render: (saida) => (
-        <span className="badge bg-danger">{saida.destino}</span>
-      ),
+      key: "cliente",
+      label: "Cliente",
+      render: (item) => item.cliente?.nome ?? "-",
+    },
+
+    {
+      key: "origem",
+      label: "Origem",
+      render: (item) => {
+        const cores = {
+          VENDA: "success",
+          DEVOLUCAO: "warning",
+          CONSUMO_INTERNO: "secondary",
+          PERDA: "danger",
+          TRANSFERENCIA: "info",
+          AJUSTE: "primary",
+        };
+
+        return (
+          <span className={`badge bg-${cores[item.origem] || "dark"}`}>
+            {item.origem}
+          </span>
+        );
+      },
     },
 
     {
@@ -108,9 +130,9 @@ export default function ListaSaidas() {
 
     {
       key: "preco_unitario",
-      label: "Preço Unit.",
-      render: (saida) =>
-        Number(saida.preco_unitario).toLocaleString("pt-BR", {
+      label: "Preço Unitário",
+      render: (item) =>
+        Number(item.preco_unitario).toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
         }),
@@ -119,17 +141,16 @@ export default function ListaSaidas() {
     {
       key: "valor_total",
       label: "Valor Total",
-      render: (saida) =>
-        Number(saida.valor_total).toLocaleString("pt-BR", {
+      render: (item) =>
+        Number(item.valor_total).toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
         }),
     },
 
     {
-      key: "data_saida",
-      label: "Data",
-      render: (saida) => new Date(saida.data_saida).toLocaleDateString("pt-BR"),
+      key: "numero_documento",
+      label: "Documento",
     },
   ];
 
@@ -166,23 +187,24 @@ export default function ListaSaidas() {
         emptyMessage="Nenhuma saída encontrada."
       />
 
-      {usuario && (
-        <SaidaModal
-          show={mostrarModal}
-          saida={saidaSelecionada}
-          usuarioId={usuario.id}
-          onClose={() => {
-            setMostrarModal(false);
-            setSaidaSelecionada(null);
-          }}
-          onSalvou={async () => {
-            await carregarSaidas();
+      <SaidaModal
+        show={mostrarModal}
+        saida={saidaSelecionada}
+        usuarioId={usuarioId}
+        onClose={() => {
+          setMostrarModal(false);
+          setSaidaSelecionada(null);
+        }}
+        onSalvou={async () => {
+          await carregarSaidas();
 
-            if (saidaSelecionada) setMensagem("Saída atualizada com sucesso!");
-            else setMensagem("Saída cadastrada com sucesso!");
-          }}
-        />
-      )}
+          setMensagem(
+            saidaSelecionada
+              ? "Saída atualizada com sucesso!"
+              : "Saída cadastrada com sucesso!",
+          );
+        }}
+      />
     </Layout>
   );
 }

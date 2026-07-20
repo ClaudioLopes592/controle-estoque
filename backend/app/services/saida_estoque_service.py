@@ -1,8 +1,9 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
+from app.models.cliente import Cliente
+from app.models.movimentacao_estoque import MovimentacaoEstoque
 from app.models.produto import Produto
 from app.models.saida_estoque import SaidaEstoque
-from app.models.movimentacao_estoque import MovimentacaoEstoque
 from app.schemas.saida_estoque import (
     SaidaEstoqueCreate,
     SaidaEstoqueUpdate,
@@ -13,11 +14,29 @@ class SaidaEstoqueService:
 
     @staticmethod
     def listar(db: Session):
-        return db.query(SaidaEstoque).order_by(SaidaEstoque.data_saida.desc()).all()
+        return (
+            db.query(SaidaEstoque)
+            .options(
+                joinedload(SaidaEstoque.produto),
+                joinedload(SaidaEstoque.cliente),
+                joinedload(SaidaEstoque.usuario),
+            )
+            .order_by(SaidaEstoque.data_saida.desc())
+            .all()
+        )
 
     @staticmethod
     def buscar_por_id(db: Session, saida_id: int):
-        saida = db.query(SaidaEstoque).filter(SaidaEstoque.id == saida_id).first()
+        saida = (
+            db.query(SaidaEstoque)
+            .options(
+                joinedload(SaidaEstoque.produto),
+                joinedload(SaidaEstoque.cliente),
+                joinedload(SaidaEstoque.usuario),
+            )
+            .filter(SaidaEstoque.id == saida_id)
+            .first()
+        )
 
         if not saida:
             raise ValueError("Saída não encontrada.")
@@ -25,7 +44,10 @@ class SaidaEstoqueService:
         return saida
 
     @staticmethod
-    def criar(db: Session, dados: SaidaEstoqueCreate):
+    def criar(
+        db: Session,
+        dados: SaidaEstoqueCreate,
+    ):
 
         produto = (
             db.query(Produto)
@@ -36,22 +58,59 @@ class SaidaEstoqueService:
         if not produto:
             raise ValueError("Produto não encontrado.")
 
+        # Cliente obrigatório para vendas
+        if dados.origem == "VENDA":
+
+            if not dados.cliente_id:
+                raise ValueError(
+                    "Cliente é obrigatório para vendas."
+                )
+
+            cliente = (
+                db.query(Cliente)
+                .filter(Cliente.id == dados.cliente_id)
+                .first()
+            )
+
+            if not cliente:
+                raise ValueError(
+                    "Cliente não encontrado."
+                )
+
+        elif dados.cliente_id:
+
+            cliente = (
+                db.query(Cliente)
+                .filter(Cliente.id == dados.cliente_id)
+                .first()
+            )
+
+            if not cliente:
+                raise ValueError(
+                    "Cliente não encontrado."
+                )
+
         estoque_atual = float(produto.estoque_atual)
 
         if estoque_atual < float(dados.quantidade):
-            raise ValueError("Estoque insuficiente para realizar a saída.")
+            raise ValueError(
+                "Estoque insuficiente para realizar a saída."
+            )
 
-        # Atualiza estoque
-        produto.estoque_atual = estoque_atual - float(dados.quantidade)
+        produto.estoque_atual = (
+            estoque_atual - float(dados.quantidade)
+        )
 
-        # Registra a saída
         saida = SaidaEstoque(**dados.model_dump())
 
         db.add(saida)
 
-        # Registra automaticamente a movimentação
+        db.flush()
+
         movimentacao = MovimentacaoEstoque(
+            saida_id=saida.id,
             produto_id=dados.produto_id,
+            usuario_id=dados.usuario_id,
             tipo="S",
             origem=dados.origem,
             quantidade=dados.quantidade,
@@ -65,7 +124,16 @@ class SaidaEstoqueService:
 
         db.refresh(saida)
 
-        return saida
+        return (
+            db.query(SaidaEstoque)
+            .options(
+                joinedload(SaidaEstoque.produto),
+                joinedload(SaidaEstoque.cliente),
+                joinedload(SaidaEstoque.usuario),
+            )
+            .filter(SaidaEstoque.id == saida.id)
+            .first()
+        )
 
     @staticmethod
     def atualizar(
@@ -79,26 +147,61 @@ class SaidaEstoqueService:
             saida_id,
         )
 
-        for campo, valor in dados.model_dump(exclude_unset=True).items():
-            setattr(saida, campo, valor)
+        for campo, valor in dados.model_dump(
+            exclude_unset=True
+        ).items():
+
+            setattr(
+                saida,
+                campo,
+                valor,
+            )
 
         db.commit()
 
         db.refresh(saida)
 
-        return saida
+        return (
+            db.query(SaidaEstoque)
+            .options(
+                joinedload(SaidaEstoque.produto),
+                joinedload(SaidaEstoque.cliente),
+                joinedload(SaidaEstoque.usuario),
+            )
+            .filter(SaidaEstoque.id == saida.id)
+            .first()
+        )
 
     @staticmethod
-    def excluir(db: Session, saida_id: int):
+    def excluir(
+        db: Session,
+        saida_id: int,
+    ):
 
         saida = SaidaEstoqueService.buscar_por_id(
             db,
             saida_id,
         )
 
-        produto = db.query(Produto).filter(Produto.id == saida.produto_id).first()
+        produto = (
+            db.query(Produto)
+            .filter(Produto.id == saida.produto_id)
+            .first()
+        )
 
-        produto.estoque_atual = float(produto.estoque_atual) + float(saida.quantidade)
+        if produto:
+            produto.estoque_atual += saida.quantidade
+
+        movimentacao = (
+            db.query(MovimentacaoEstoque)
+            .filter(
+                MovimentacaoEstoque.saida_id == saida.id
+            )
+            .first()
+        )
+
+        if movimentacao:
+            db.delete(movimentacao)
 
         db.delete(saida)
 

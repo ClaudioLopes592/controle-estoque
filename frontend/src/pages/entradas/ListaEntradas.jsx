@@ -63,12 +63,14 @@ export default function ListaEntradas() {
     setMensagem("Entrada excluída com sucesso.");
   }
 
-  const entradasFiltradas = entradas.filter((entrada) => {
+  const entradasFiltradas = entradas.filter((item) => {
     const texto = pesquisa.toLowerCase();
 
     return (
-      entrada.numero_documento?.toLowerCase().includes(texto) ||
-      entrada.origem?.toLowerCase().includes(texto)
+      item.produto?.nome?.toLowerCase().includes(texto) ||
+      item.fornecedor?.nome?.toLowerCase().includes(texto) ||
+      item.origem?.toLowerCase().includes(texto) ||
+      item.numero_documento?.toLowerCase().includes(texto)
     );
   });
 
@@ -80,13 +82,15 @@ export default function ListaEntradas() {
     },
 
     {
-      key: "produto_id",
+      key: "produto",
       label: "Produto",
+      render: (item) => item.produto?.nome ?? "-",
     },
 
     {
-      key: "fornecedor_id",
+      key: "fornecedor",
       label: "Fornecedor",
+      render: (item) => item.fornecedor?.nome ?? "-",
     },
 
     {

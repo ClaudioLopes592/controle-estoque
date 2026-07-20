@@ -43,6 +43,16 @@ class MovimentacaoEstoque(Base):
 
     produto_id: Mapped[int] = mapped_column(ForeignKey("produtos.id"), nullable=False)
 
+    entrada_id: Mapped[int | None] = mapped_column(
+        ForeignKey("entradas_estoque.id"),
+        nullable=True,
+    )
+
+    saida_id: Mapped[int | None] = mapped_column(
+        ForeignKey("saidas_estoque.id"),
+        nullable=True,
+    )
+
     tipo: Mapped[TipoMovimentacao] = mapped_column(
         SqlEnum(TipoMovimentacao), nullable=False
     )
@@ -59,4 +69,21 @@ class MovimentacaoEstoque(Base):
 
     data_movimento: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+    usuario_id: Mapped[int | None] = mapped_column(
+    ForeignKey("usuarios.id"),
+    nullable=True,
+    )
+
     produto = relationship("Produto")
+
+    entrada = relationship(
+        "EntradaEstoque",
+    )
+
+    saida = relationship(
+        "SaidaEstoque",
+    )
+
+    usuario = relationship(
+        "Usuario",
+    )

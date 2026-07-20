@@ -13,6 +13,7 @@ import ListaCategorias from "../pages/categorias/ListaCategorias";
 import ListaFornecedores from "../pages/fornecedores/ListaFornecedores";
 import ListaClientes from "../pages/clientes/ListaClientes";
 import ListaProdutos from "../pages/produtos/ListaProdutos";
+import ListaUnidades from "../pages/unidades/ListaUnidades";
 import ListaMovimentacoes from "../pages/movimentacoes/ListaMovimentacoes";
 import ListaEntradas from "../pages/entradas/ListaEntradas";
 import ListaSaidas from "../pages/saidas/ListaSaidas";
@@ -21,10 +22,8 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota pública */}
         <Route path="/login" element={<Login />} />
-
-        {/* Rotas protegidas */}
+        
         <Route
           path="/"
           element={
@@ -60,6 +59,17 @@ export default function AppRoutes() {
             <ProtectedRoute>
               <RoleRoute roles={["ADMIN", "GERENTE"]}>
                 <ListaCategorias />
+              </RoleRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/unidades"
+          element={
+            <ProtectedRoute>
+              <RoleRoute roles={["ADMIN", "GERENTE"]}>
+                <ListaUnidades />
               </RoleRoute>
             </ProtectedRoute>
           }

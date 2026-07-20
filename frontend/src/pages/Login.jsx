@@ -34,7 +34,6 @@ export default function Login() {
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">
-        {/* Lado esquerdo */}
 
         <div
           className="col-lg-7 d-none d-lg-flex align-items-center justify-content-center text-white"
@@ -58,8 +57,6 @@ export default function Login() {
             </p>
           </div>
         </div>
-
-        {/* Formulário */}
 
         <div className="col-lg-5 d-flex align-items-center justify-content-center bg-light">
           <div

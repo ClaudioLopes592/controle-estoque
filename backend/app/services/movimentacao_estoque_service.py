@@ -4,7 +4,6 @@ from app.models.movimentacao_estoque import MovimentacaoEstoque, TipoMovimentaca
 
 from app.models.produto import Produto
 
-# from app.schemas.movimentacao_estoque import MovimentacaoEstoqueCreate
 
 from decimal import Decimal
 
@@ -30,47 +29,3 @@ class MovimentacaoEstoqueService:
             .filter(MovimentacaoEstoque.id == movimentacao_id)
             .first()
         )
-
-    # @staticmethod
-    # def criar(db: Session, dados: MovimentacaoEstoqueCreate):
-
-    #     produto = db.query(Produto).filter(Produto.id == dados.produto_id).first()
-
-    #     if not produto:
-    #         raise ValueError("Produto não encontrado.")
-
-    #     quantidade = Decimal(str(dados.quantidade))
-    #     preco = Decimal(str(dados.preco_unitario))
-
-    #     if quantidade <= 0:
-    #         raise ValueError("A quantidade deve ser maior que zero.")
-
-    #     if dados.tipo == TipoMovimentacao.ENTRADA:
-
-    #         produto.estoque_atual += quantidade
-
-    #     else:
-
-    #         if produto.estoque_atual < quantidade:
-    #             raise ValueError("Estoque insuficiente.")
-
-    #         produto.estoque_atual -= quantidade
-
-    #     movimentacao = MovimentacaoEstoque(
-    #         produto_id=dados.produto_id,
-    #         tipo=dados.tipo,
-    #         origem=dados.origem,
-    #         quantidade=quantidade,
-    #         preco_unitario=preco,
-    #         observacao=dados.observacao,
-    #     )
-
-    #     try:
-    #         db.add(movimentacao)
-    #         db.commit()
-    #         db.refresh(produto)
-    #         db.refresh(movimentacao)
-    #         return movimentacao
-    #     except Exception as e:
-    #         db.rollback()
-    #         raise e
